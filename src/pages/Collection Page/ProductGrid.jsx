@@ -323,7 +323,8 @@ const ProductGrid = ({
     });
   };
 
-  const baseProducts = useMemo(() => [], []); /*
+  const baseProducts = useMemo(
+    () => ([
   {
     id: 1,
     category: "LEHENGA",
@@ -565,7 +566,9 @@ const ProductGrid = ({
   isRental: false
 }
 
-], []); */
+    ]),
+    []
+  );
 
   const getSortSeed = (product) => {
     const numeric = Number(String(product?.id ?? "").replace(/[^0-9]/g, ""));
