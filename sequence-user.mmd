@@ -1,0 +1,54 @@
+﻿sequenceDiagram
+    autonumber
+    actor Customer as User
+    participant UI as React Frontend
+    participant LS as localStorage
+    participant API as Express API
+    participant DB as MySQL
+
+    Customer->>UI: Open app and browse collections
+    UI-->>Customer: Show products and details
+
+    alt Register
+        Customer->>UI: Submit signup form
+        UI->>API: POST /api/register
+        API->>DB: Insert user
+        DB-->>API: Success
+        API-->>UI: Registration success
+        UI->>LS: Save user session
+        UI-->>Customer: Redirect to home
+    else Login
+        Customer->>UI: Submit login form
+        UI->>API: POST /api/login
+        API->>DB: Validate user
+        DB-->>API: User record
+        API-->>UI: Login success
+        UI->>LS: Save user and role
+    end
+
+    Customer->>UI: Add item to cart
+    UI->>LS: Save cart items
+    LS-->>UI: Cart updated event
+    UI-->>Customer: Cart badge updated
+
+    Customer->>UI: Proceed to checkout
+    UI->>LS: Read cart and saved address
+    UI-->>Customer: Checkout summary
+
+    alt Buy flow
+        Customer->>UI: Fill address and shipping
+        UI-->>Customer: Navigate payment page
+    else Rent flow
+        Customer->>UI: Select rental dates and upload ID
+        UI-->>Customer: Navigate payment page
+    end
+
+    Customer->>UI: Choose payment method and pay
+    UI-->>Customer: Processing and success state
+    UI-->>Customer: Order confirmed options
+
+    Customer->>UI: Track order
+    UI-->>Customer: Status timeline
+
+    Customer->>UI: Open contact support and submit issue
+    UI-->>Customer: Ticket submitted confirmation

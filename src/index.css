@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+html,
+body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Clerk: hide footer/badge inside embedded auth card */
+.cl-footer,
+.cl-badge {
+  display: none !important;
+}
+
+/* Clerk: remove the inner rounded "card" container */
+.cl-cardBox,
+.cl-card {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Fix: prevent Clerk form from overflowing on very small screens */
+.cl-rootBox,
+.cl-cardBox,
+.cl-card,
+.cl-main,
+.cl-form {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+@media (max-width: 420px) {
+  .cl-formFieldRow {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .cl-formFieldRow > * {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
