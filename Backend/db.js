@@ -54,7 +54,13 @@ const dbConfig = {
   connectTimeout: Number(pickNonEmpty(process.env.MYSQL_CONNECT_TIMEOUT) || 15000),
 };
 
-const mysqlUrl = pickNonEmpty(process.env.MYSQL_URL, process.env.DATABASE_URL);
+// Prefer a full connection URL if present (Railway often provides one).
+// Also handle misconfiguration where a URL is pasted into MYSQLHOST/DB_HOST.
+const mysqlUrlRaw = pickNonEmpty(process.env.MYSQL_URL, process.env.DATABASE_URL);
+const hostLooksLikeUrl =
+  typeof dbConfig.host === "string" &&
+  (dbConfig.host.startsWith("mysql://") || dbConfig.host.startsWith("mysql2://"));
+const mysqlUrl = hostLooksLikeUrl ? dbConfig.host : mysqlUrlRaw;
 const canUseMysqlUrl =
   typeof mysqlUrl === "string" &&
   (mysqlUrl.startsWith("mysql://") || mysqlUrl.startsWith("mysql2://"));

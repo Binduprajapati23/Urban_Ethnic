@@ -344,6 +344,18 @@ const verifyPassword = (plainPassword, storedPassword) => {
 
 const ensureUserSchema = () => {
   const migrations = [
+    `
+    CREATE TABLE IF NOT EXISTS users (
+      id INT NOT NULL AUTO_INCREMENT,
+      f_name VARCHAR(100) NULL,
+      l_name VARCHAR(100) NULL,
+      email VARCHAR(191) NOT NULL,
+      password VARCHAR(255) NOT NULL,
+      phone VARCHAR(20) NULL,
+      PRIMARY KEY (id),
+      UNIQUE KEY uq_users_email (email)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `,
     "ALTER TABLE users MODIFY COLUMN password VARCHAR(255) NOT NULL",
     "ALTER TABLE users MODIFY COLUMN phone VARCHAR(20) NULL",
   ];
@@ -361,6 +373,19 @@ ensureUserSchema();
 
 const ensureAdminUserSchema = () => {
   const migrations = [
+    `
+    CREATE TABLE IF NOT EXISTS order_user (
+      id INT NOT NULL AUTO_INCREMENT,
+      customer VARCHAR(191) NULL,
+      email VARCHAR(191) NOT NULL,
+      phone BIGINT NULL,
+      \`order\` INT NOT NULL DEFAULT 0,
+      rental INT NOT NULL DEFAULT 0,
+      spent BIGINT NOT NULL DEFAULT 0,
+      PRIMARY KEY (id),
+      UNIQUE KEY uq_order_user_email (email)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `,
     "ALTER TABLE order_user MODIFY COLUMN phone BIGINT NULL",
   ];
 
@@ -2923,6 +2948,39 @@ app.patch("/api/owner/:ownerEmail/returns/requests/:requestId/stage", async (req
 
 const ensureProductsSchema = async () => {
   try {
+    await queryAsync(`
+      CREATE TABLE IF NOT EXISTS products (
+        id INT NOT NULL AUTO_INCREMENT,
+        legacy_id VARCHAR(100) NULL,
+        product_name VARCHAR(255) NOT NULL,
+        category VARCHAR(100) NOT NULL,
+        rent_price BIGINT NOT NULL DEFAULT 0,
+        buy_price BIGINT NOT NULL DEFAULT 0,
+        stock VARCHAR(20) NOT NULL DEFAULT '1',
+        image_url TEXT NULL,
+        image_urls TEXT NULL,
+        availability_type VARCHAR(50) NOT NULL DEFAULT 'All',
+        is_hero TINYINT(1) NOT NULL DEFAULT 0,
+        is_category_highlight TINYINT(1) NOT NULL DEFAULT 0,
+        is_featured TINYINT(1) NOT NULL DEFAULT 0,
+        is_collection TINYINT(1) NOT NULL DEFAULT 1,
+        description TEXT NULL,
+        occasion VARCHAR(100) NULL,
+        size VARCHAR(50) NULL,
+        color VARCHAR(50) NULL,
+        city VARCHAR(100) NULL,
+        owner_email VARCHAR(191) NULL,
+        owner_name VARCHAR(191) NULL,
+        is_draft TINYINT(1) NOT NULL DEFAULT 0,
+        created_at DATETIME NULL,
+        updated_at DATETIME NULL,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_products_legacy_id (legacy_id),
+        KEY ix_products_owner_email (owner_email),
+        KEY ix_products_category (category)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
     const columnRows = await queryAsync(
       `
       SELECT COLUMN_NAME
@@ -3371,6 +3429,23 @@ app.get("/api/owner/:ownerEmail/stats", async (req, res) => {
 });
 
 const ensureDashboardSchema = async () => {
+  try {
+    await queryAsync(`
+      CREATE TABLE IF NOT EXISTS dashboard (
+        id INT NOT NULL AUTO_INCREMENT,
+        order_id VARCHAR(100) NOT NULL,
+        customer VARCHAR(150) NOT NULL,
+        type VARCHAR(20) NOT NULL,
+        amount BIGINT NOT NULL,
+        status VARCHAR(50) NOT NULL,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_dashboard_order_id (order_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+  } catch (err) {
+    console.log("Dashboard schema migration warning:", err.sqlMessage || err.message);
+  }
+
   const migrations = [
     "ALTER TABLE dashboard MODIFY COLUMN order_id VARCHAR(100) NOT NULL",
     "ALTER TABLE dashboard MODIFY COLUMN customer VARCHAR(150) NOT NULL",
