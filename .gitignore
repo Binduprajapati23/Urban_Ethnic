@@ -16,6 +16,9 @@ dist-ssr
 .env
 .env.*
 
+# Database dumps
+database.sql
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
