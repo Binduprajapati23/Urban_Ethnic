@@ -126,8 +126,7 @@ const OwnerEarnings = () => {
 
     const breakdown = Array.from(breakdownMap.entries())
       .map(([label, amount]) => ({ label, amount }))
-      .sort((a, b) => b.amoun
-      t - a.amount)
+      .sort((a, b) => b.amount - a.amount)
       .slice(0, 8);
 
     const breakdownTotal = breakdown.reduce((sum, item) => sum + item.amount, 0);
